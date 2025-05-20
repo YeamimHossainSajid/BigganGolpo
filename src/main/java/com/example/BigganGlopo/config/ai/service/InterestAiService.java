@@ -17,8 +17,7 @@ public class InterestAiService {
 //  OpenRouterService openRouterService;
 
 
-    public String interest(Long id,String question) {
-        User user = userRepo.findById(id).get();
+    public String interest(String question) {
 //        String interest = Optional.ofNullable(user)
 //                .map(User::getStudent)
 //                .map(student -> {

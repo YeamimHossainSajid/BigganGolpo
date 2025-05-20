@@ -13,7 +13,7 @@ public class interestAiController {
         this.interestAi = InterestAiService;
     }
     @GetMapping("interest/question/{id}/{text}")
-    public ResponseEntity<String> interests(@PathVariable Long id,@PathVariable String text) {
-        return ResponseEntity.ok(interestAi.interest(id, text));
+    public ResponseEntity<String> interests(@PathVariable String text) {
+        return ResponseEntity.ok(interestAi.interest(text));
     }
 }
