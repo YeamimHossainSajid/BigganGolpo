@@ -7,18 +7,18 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-//@Service
-//public class InterestAiService {
-//    @Autowired
-//    UserRepo userRepo;
-//    @Autowired
-//    CohereService cohereService;
-////    @Autowired
-////    OpenRouterService openRouterService;
-//
-//
-//    public String interest(Long id,String question) {
-//        User user = userRepo.findById(id).get();
+@Service
+public class InterestAiService {
+    @Autowired
+    UserRepo userRepo;
+    @Autowired
+    CohereService cohereService;
+//   @Autowired
+//  OpenRouterService openRouterService;
+
+
+    public String interest(Long id,String question) {
+        User user = userRepo.findById(id).get();
 //        String interest = Optional.ofNullable(user)
 //                .map(User::getStudent)
 //                .map(student -> {
@@ -27,8 +27,8 @@ import java.util.Optional;
 //                    return interests + futurePlans + futurePlans;
 //                })
 //                .orElse("");
-//        String answer = cohereService.interest(interest+"       above are the information of a student.based on that answer the below questions in 2 lines.if question is not related to this future plan and interest then answer accordingly.          question= "+question);
-//        return answer;
-//    }
-//
-//}
+        String answer = cohereService.interest(question);
+        return answer;
+    }
+
+}
