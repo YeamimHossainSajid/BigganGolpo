@@ -7,5 +7,6 @@ import lombok.Data;
 @Entity
 @Data
 public class Blog extends BaseEntity {
-    private String content;
+    private String description;
+    private String url;
 }
