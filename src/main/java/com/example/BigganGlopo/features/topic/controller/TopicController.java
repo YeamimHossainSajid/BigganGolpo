@@ -10,10 +10,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+@RestController
+@RequestMapping("/topic")
 public class TopicController extends AbstractController<Topic, TopicRequestDto, GenericSearchDto> {
     private TopicService topicService;
     public TopicController(IService<Topic, TopicRequestDto, GenericSearchDto> service,TopicService topicService) {

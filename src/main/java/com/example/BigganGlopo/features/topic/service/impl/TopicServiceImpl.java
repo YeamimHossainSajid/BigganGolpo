@@ -4,6 +4,7 @@ import com.example.BigganGlopo.config.image.service.CloudneryImageService;
 import com.example.BigganGlopo.features.topic.entity.Topic;
 import com.example.BigganGlopo.features.topic.payload.request.TopicRequestDto;
 import com.example.BigganGlopo.features.topic.payload.response.TopicResponseDto;
+import com.example.BigganGlopo.features.topic.repository.TopicRepo;
 import com.example.BigganGlopo.features.topic.service.TopicService;
 import com.example.BigganGlopo.generic.payload.request.GenericSearchDto;
 import com.example.BigganGlopo.generic.payload.response.BaseResponseDto;
@@ -22,6 +23,8 @@ public class TopicServiceImpl extends AbstractService<Topic, TopicRequestDto, Ge
 
     @Autowired
     private CloudneryImageService cloudneryImageService;
+    @Autowired
+    private TopicRepo topicRepo;
     public TopicServiceImpl(AbstractRepository<Topic> repository) {
         super(repository);
     }
@@ -57,6 +60,8 @@ public class TopicServiceImpl extends AbstractService<Topic, TopicRequestDto, Ge
             entity.setUrl(profileImageUrl);
         }
         entity.setName(topicRequestDto.getName());
+
+        topicRepo.save(entity);
     }
 }
 
