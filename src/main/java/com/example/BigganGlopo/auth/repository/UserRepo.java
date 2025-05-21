@@ -17,7 +17,9 @@ public interface UserRepo extends JpaRepository<User, Long > {
     @Query("SELECT u FROM User u WHERE u.id = :userId")
     Optional<CustomUserResponseDTO> findUserProjectionById(@Param("userId") Long userId);
 
-
+    @Query("""
+            SELECT u FROM User u where u.username=:username
+            """)
     User findByUsername(String username);
 
     @EntityGraph( attributePaths = { "roles" } )
