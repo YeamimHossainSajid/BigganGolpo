@@ -36,3 +36,4 @@ public class TopicServiceImpl extends AbstractService<Topic, TopicRequestDto, Ge
         return null;
     }
 }
+
