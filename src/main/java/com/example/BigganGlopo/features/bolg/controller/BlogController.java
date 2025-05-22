@@ -51,4 +51,9 @@ public class BlogController {
         List<PostDto> posts = postService.getAllPostsWithDetails();
         return ResponseEntity.ok(posts);
     }
+    @GetMapping("/user/{userId}")
+    public List<PostDto> getBlogsByUserId(@PathVariable Long userId) {
+        return postService.searchBlogByUserId(userId);
+    }
+
 }

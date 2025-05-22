@@ -99,4 +99,10 @@ public class BlogServiceImpl {
     public List<Blog> getAllPostsSortedByTime() {
         return postRepository.findAllByOrderByCreatedAtDesc();
     }
+    public List<PostDto> searchBlogByUserId(Long userId) {
+        List<Blog> userPosts = postRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        return userPosts.stream()
+                .map(this::mapToPostDto)
+                .collect(Collectors.toList());
+    }
 }
