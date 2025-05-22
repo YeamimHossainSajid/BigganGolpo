@@ -26,7 +26,7 @@ public class InterestAiService {
 //                    return interests + futurePlans + futurePlans;
 //                })
 //                .orElse("");
-        String answer = cohereService.interest(question);
+        String answer = cohereService.interest(question+" in short ");
         return answer;
     }
 
