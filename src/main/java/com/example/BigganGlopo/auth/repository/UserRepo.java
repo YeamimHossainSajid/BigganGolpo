@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -27,7 +28,7 @@ public interface UserRepo extends JpaRepository<User, Long > {
     @Query("""
         SELECT u FROM User u WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :username, '%'))
        """)
-    CustomUserResponseDTO searchByUsername(String username );
+   List<CustomUserResponseDTO> searchByUsername(String username );
 
     boolean existsByEmail( String email );
 

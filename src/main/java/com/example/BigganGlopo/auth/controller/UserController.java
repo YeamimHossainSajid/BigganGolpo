@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping( "/User" )
@@ -60,7 +61,7 @@ public class UserController {
     }
 
     @GetMapping("search/{username}")
-    public ResponseEntity<CustomUserResponseDTO> searchByUserName(@PathVariable("username") String username) {
+    public ResponseEntity<List<CustomUserResponseDTO>>searchByUserName(@PathVariable("username") String username) {
         return ResponseEntity.ok(userService.searchByUsername(username));
     }
 
