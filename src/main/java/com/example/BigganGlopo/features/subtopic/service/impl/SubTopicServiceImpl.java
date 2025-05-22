@@ -9,6 +9,8 @@ import com.example.BigganGlopo.features.subtopic.payload.response.SubTopicRespon
 import com.example.BigganGlopo.features.subtopic.repository.SubTopicElementRepository;
 import com.example.BigganGlopo.features.subtopic.repository.SubTopicRepository;
 import com.example.BigganGlopo.features.subtopic.service.SubTopicService;
+import com.example.BigganGlopo.features.topic.repository.TopicRepo;
+import com.example.BigganGlopo.features.topic.service.TopicService;
 import com.example.BigganGlopo.generic.payload.request.GenericSearchDto;
 import com.example.BigganGlopo.generic.payload.response.BaseResponseDto;
 import com.example.BigganGlopo.generic.repository.AbstractRepository;
@@ -34,6 +36,8 @@ public class SubTopicServiceImpl extends AbstractService<SubTopic, SubTopicReque
     private CloudneryImageService cloudneryImageService;
     @Autowired
     private SubTopicElementRepository subTopicElementRepository;
+    @Autowired
+    private TopicRepo topicRepo;
 
     public SubTopicServiceImpl(AbstractRepository<SubTopic> repository) {
         super(repository);
@@ -47,8 +51,17 @@ public class SubTopicServiceImpl extends AbstractService<SubTopic, SubTopicReque
                 .map(e -> new SubTopicElementDto(e.getType(), e.getValue()))
                 .toList();
 
-        return new SubTopicResponseDto(subTopic.getId(), subTopic.getTitle(), elements);
+        String topicName = subTopic.getTopic() != null ? subTopic.getTopic().getName() : null;
+
+        return new SubTopicResponseDto(
+                subTopic.getId(),
+                subTopic.getTitle(),
+                elements,
+                topicName
+        );
     }
+
+
 
     @Override
     protected SubTopic convertToEntity(SubTopicRequestDto subTopicRequestDto) throws IOException {
@@ -67,6 +80,7 @@ public class SubTopicServiceImpl extends AbstractService<SubTopic, SubTopicReque
 
 
     public void uploadSubTopic(
+            Long topicId,
             String title,
             List<String> elementTypes,
             List<String> textContents,
@@ -75,6 +89,7 @@ public class SubTopicServiceImpl extends AbstractService<SubTopic, SubTopicReque
 
         SubTopic subTopic = new SubTopic();
         subTopic.setTitle(title);
+        subTopic.setTopic(topicRepo.findById(topicId).get());
         subTopicRepository.save(subTopic);
 
         int textIndex = 0;
@@ -105,4 +120,11 @@ public class SubTopicServiceImpl extends AbstractService<SubTopic, SubTopicReque
         Map<String, Object> uploadResult = cloudneryImageService.upload(image);
         return (String) uploadResult.get("secure_url");
     }
+    public List<SubTopicResponseDto> getSubTopicsByTopicName(String topicName) {
+        List<SubTopic> subTopics = subTopicRepository.findByTopicNameContainingIgnoreCase(topicName);
+        return subTopics.stream()
+                .map(this::convertToResponseDto)
+                .toList();
+    }
+
 }

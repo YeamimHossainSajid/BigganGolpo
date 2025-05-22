@@ -7,4 +7,5 @@ import lombok.Data;
 public class SubTopicRequestDto implements IDto {
     private String title;
     private String content;
+    private Long topicId;
 }

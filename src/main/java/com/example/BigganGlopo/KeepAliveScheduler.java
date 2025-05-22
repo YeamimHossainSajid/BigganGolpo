@@ -13,7 +13,7 @@ public class KeepAliveScheduler {
     private static final Logger logger = LoggerFactory.getLogger(KeepAliveScheduler.class);
     private static final String HEALTHCHECK_URL = "https://biggangolpo.onrender.com/healthcheck";
 
-    @Scheduled(fixedRate = 300000)
+    @Scheduled(fixedRate =  300000)
     public void pingBackend() {
         try {
             RestTemplate restTemplate = new RestTemplate();
