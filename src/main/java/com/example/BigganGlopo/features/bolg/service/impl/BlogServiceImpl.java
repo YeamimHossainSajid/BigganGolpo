@@ -1,67 +1,102 @@
 package com.example.BigganGlopo.features.bolg.service.impl;
 
-import com.example.BigganGlopo.config.image.service.CloudneryImageService;
+import com.example.BigganGlopo.auth.model.User;
+import com.example.BigganGlopo.auth.repository.UserRepo;
 import com.example.BigganGlopo.features.bolg.entity.Blog;
-import com.example.BigganGlopo.features.bolg.payload.BlogRequestDto;
-import com.example.BigganGlopo.features.bolg.payload.BlogResponseDto;
+import com.example.BigganGlopo.features.bolg.payload.PostDto;
 import com.example.BigganGlopo.features.bolg.repository.BlogRepository;
-import com.example.BigganGlopo.features.bolg.service.BlogService;
-import com.example.BigganGlopo.features.topic.entity.Topic;
-import com.example.BigganGlopo.features.topic.payload.request.TopicRequestDto;
-import com.example.BigganGlopo.generic.payload.request.GenericSearchDto;
-import com.example.BigganGlopo.generic.payload.response.BaseResponseDto;
-import com.example.BigganGlopo.generic.repository.AbstractRepository;
-import com.example.BigganGlopo.generic.service.AbstractService;
+import com.example.BigganGlopo.features.comment.entity.Comment;
+import com.example.BigganGlopo.features.comment.payload.CommentDto;
+import com.example.BigganGlopo.features.comment.repository.CommentRepository;
+import com.example.BigganGlopo.features.vote.entity.Vote;
+import com.example.BigganGlopo.features.vote.payload.request.ReactionDto;
+import com.example.BigganGlopo.features.vote.repository.ReactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.Map;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-public  class BlogServiceImpl extends AbstractService<Blog, BlogRequestDto, GenericSearchDto> implements BlogService {
+public class BlogServiceImpl {
+    private final BlogRepository postRepository;
+    private final CommentRepository commentRepository;
+    private final ReactionRepository reactionRepository;
+
     @Autowired
-    BlogRepository repository;
-    @Autowired
-    CloudneryImageService cloudneryImageService;
-    public BlogServiceImpl(AbstractRepository<Blog> repository) {
-        super(repository);
+    UserRepo userRepo;
+
+    public BlogServiceImpl(BlogRepository postRepository,
+                           CommentRepository commentRepository,
+                           ReactionRepository reactionRepository) {
+        this.postRepository = postRepository;
+        this.commentRepository = commentRepository;
+        this.reactionRepository = reactionRepository;
     }
 
-    @Override
-    protected BlogResponseDto convertToResponseDto(Blog blog) {
-        BlogResponseDto responseDto = new BlogResponseDto();
-        responseDto.setDescription(blog.getDescription());
-        responseDto.setUrl(blog.getUrl());
-        return responseDto;
+    public List<PostDto> getAllPostsWithDetails() {
+        List<Blog> posts = postRepository.findAllByOrderByCreatedAtDesc();
+        return posts.stream()
+                .map(this::mapToPostDto)
+                .collect(Collectors.toList());
     }
 
-    @Override
-    protected Blog convertToEntity(BlogRequestDto blogRequestDto) throws IOException {
-        return null;
+    private PostDto mapToPostDto(Blog post) {
+        PostDto dto = new PostDto();
+        dto.setId(post.getId());
+        dto.setContent(post.getContent());
+        dto.setUsername(post.getUser().getUsername());
+        dto.setCreatedAt(post.getCreatedAt());
+
+        List<ReactionDto> postReactions = reactionRepository.findByPostId(post.getId())
+                .stream().map(this::mapToReactionDto).toList();
+        dto.setReactions(postReactions);
+
+        List<CommentDto> commentDtos = commentRepository.findByPostId(post.getId()).stream()
+                .filter(c -> c.getParentComment() == null)
+                .map(this::mapToCommentDto)
+                .collect(Collectors.toList());
+        dto.setComments(commentDtos);
+
+        return dto;
     }
 
-    @Override
-    protected Blog updateEntity(BlogRequestDto blogRequestDto, Blog entity) throws IOException {
-        return null;
+    private CommentDto mapToCommentDto(Comment comment) {
+        CommentDto dto = new CommentDto();
+        dto.setId(comment.getId());
+        dto.setContent(comment.getContent());
+        dto.setUsername(comment.getUser().getUsername());
+        dto.setCreatedAt(comment.getCreatedAt());
+
+        List<ReactionDto> commentReactions = reactionRepository.findByCommentId(comment.getId())
+                .stream().map(this::mapToReactionDto).toList();
+        dto.setReactions(commentReactions);
+
+        List<CommentDto> replies = commentRepository.findByParentCommentId(comment.getId()).stream()
+                .map(this::mapToCommentDto)
+                .collect(Collectors.toList());
+        dto.setReplies(replies);
+
+        return dto;
     }
 
-    @Override
-    protected Specification<Blog> buildSpecification(GenericSearchDto searchDto) {
-        return null;
+    private ReactionDto mapToReactionDto(Vote reaction) {
+        ReactionDto dto = new ReactionDto();
+        dto.setId(reaction.getId());
+        dto.setType(reaction.getType());
+        dto.setUsername(reaction.getUser().getUsername());
+        return dto;
     }
 
-    public void createV2(BlogRequestDto requestDto, MultipartFile image) throws IOException {
-        Blog entity = new Blog();
-        if (image != null && !image.isEmpty()) {
-            Map<String, Object> uploadResult = cloudneryImageService.upload(image);
-            String profileImageUrl = (String) uploadResult.get("secure_url");
-            entity.setUrl(profileImageUrl);
-        }
-        entity.setDescription(requestDto.getDescription());
+    public Blog createPost(Long userId, String content) {
+        User user = userRepo.findById(userId).orElseThrow();
+        Blog post = new Blog();
+        post.setUser(user);
+        post.setContent(content);
+        return postRepository.save(post);
+    }
 
-        repository.save(entity);
+    public List<Blog> getAllPostsSortedByTime() {
+        return postRepository.findAllByOrderByCreatedAtDesc();
     }
 }

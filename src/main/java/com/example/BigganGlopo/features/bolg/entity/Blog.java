@@ -1,12 +1,19 @@
 package com.example.BigganGlopo.features.bolg.entity;
 
+import com.example.BigganGlopo.auth.model.User;
 import com.example.BigganGlopo.generic.model.BaseEntity;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import lombok.Data;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Data
 public class Blog extends BaseEntity {
-    private String description;
-    private String url;
+    @ManyToOne
+    private User user;
+
+    private String content;
+    private LocalDateTime createdAt = LocalDateTime.now();
 }
